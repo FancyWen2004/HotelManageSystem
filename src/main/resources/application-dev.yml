@@ -1,0 +1,32 @@
+#配置数据源
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/customer?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+#mybatisplus配置
+mybatis-plus:
+  global-config:
+    db-config:
+      # 更新策略
+      update-strategy: ignored
+  configuration:
+    #开启 Mybatis-Plus 的驼峰命名
+    map-underscore-to-camel-case: true
+    #配置mybatis-plus日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#  #xml文件的位置(resources下的mapper文件夹)
+#  mapper-locations: classpath:/mapper/*.xml
+#  type-aliases-package: com.example.pojo
+
+springdoc:
+  #平展swagger参数,即：不使用对象包裹参数让对象的属性平铺在平展的参数中
+  default-flat-param-object: true
+#knife4j的增强配置，开启文件上传功能
+knife4j:
+  enable: true
+  setting:
+    #    enableFileUpload: true
+    # 设置knife4j的语言国际化
+    language: zh_cn
