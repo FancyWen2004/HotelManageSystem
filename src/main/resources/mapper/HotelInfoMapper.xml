@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hotel.mapper.HotelInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.hotel.pojo.HotelInfo">
+            <id property="id" column="id" />
+            <result property="hotelName" column="hotel_name" />
+            <result property="address" column="address" />
+            <result property="contactPhone" column="contact_phone" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,hotel_name,address,contact_phone
+    </sql>
+</mapper>

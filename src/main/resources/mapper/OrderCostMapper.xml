@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hotel.mapper.OrderCostMapper">
+
+    <resultMap id="BaseResultMap" type="com.hotel.pojo.OrderCost">
+            <id property="id" column="id" />
+            <result property="orderId" column="order_id" />
+            <result property="costType" column="cost_type" />
+            <result property="amount" column="amount" />
+            <result property="paymentMethod" column="payment_method" />
+            <result property="paymentTime" column="payment_time" />
+            <result property="status" column="status" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,order_id,cost_type,amount,payment_method,payment_time,
+        status
+    </sql>
+</mapper>

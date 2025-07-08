@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hotel.mapper.OrderMainMapper">
+
+    <resultMap id="BaseResultMap" type="com.hotel.pojo.OrderMain">
+            <id property="id" column="id" />
+            <result property="orderSn" column="order_sn" />
+            <result property="customerId" column="customer_id" />
+            <result property="hotelId" column="hotel_id" />
+            <result property="roomTypeId" column="room_type_id" />
+            <result property="roomId" column="room_id" />
+            <result property="checkinDate" column="checkin_date" />
+            <result property="checkoutDate" column="checkout_date" />
+            <result property="nights" column="nights" />
+            <result property="channel" column="channel" />
+            <result property="isBreakfast" column="is_breakfast" />
+            <result property="orderStatus" column="order_status" />
+            <result property="createTime" column="create_time" />
+            <result property="source" column="source" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,order_sn,customer_id,hotel_id,room_type_id,room_id,
+        checkin_date,checkout_date,nights,channel,is_breakfast,
+        order_status,create_time,source
+    </sql>
+
+    <select id="saleStatusInPeriod" resultType="com.hotel.pojo.vo.RoomOrderVo">
+        SELECT
+        r.room_number RoomNumber,
+        c.name AS CustomerName,
+        o.channel as Source,
+        o.checkin_date CheckinDate,
+        o.checkout_date CheckoutDate,
+        r.status AS RoomStatus
+        FROM
+        room_info r
+        LEFT JOIN
+        order_main o ON r.id = o.room_id
+        AND o.room_type_id = #{roomTypeId}
+        AND (
+        (#{startDate} &lt;= o.checkout_date AND #{endDate} &gt;= o.checkin_date)
+        OR (o.checkin_date BETWEEN #{startDate} AND #{endDate})
+        OR (o.checkout_date BETWEEN #{startDate} AND #{endDate})
+        )
+        LEFT JOIN
+        customer_info c ON o.customer_id = c.id
+        WHERE
+        r.room_type_id = #{roomTypeId}
+        ORDER BY
+        r.room_number,
+        o.checkin_date;
+    </select>
+    <select id="saleStatusInOneDay" resultType="com.hotel.pojo.vo.RoomOrderVo">
+        SELECT
+            r.room_number RoomNumber,
+            c.name AS CustomerName,
+            o.channel as Source,
+            o.checkin_date CheckinDate,
+            o.checkout_date CheckoutDate,
+            r.status AS RoomStatus
+        FROM
+            room_info r
+                LEFT JOIN
+            order_main o ON r.id = o.room_id
+                AND o.room_type_id = #{roomTypeId}
+                AND (#{date} between o.checkin_date and o.checkout_date)
+                LEFT JOIN
+            customer_info c ON o.customer_id = c.id
+        WHERE
+            r.room_type_id = #{roomTypeId}
+        ORDER BY
+            r.room_number,
+            o.checkin_date;
+    </select>
+
+</mapper>
