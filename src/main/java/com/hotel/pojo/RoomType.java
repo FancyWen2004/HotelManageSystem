@@ -12,6 +12,7 @@ import lombok.Data;
 @TableName(value ="room_type")
 @Data
 public class RoomType {
+
     @TableId(type = IdType.AUTO)
     private Long id;
 
@@ -21,5 +22,6 @@ public class RoomType {
 
     private String description;
 
-    private Integer totalRooms;
+    private String img;
+
 }

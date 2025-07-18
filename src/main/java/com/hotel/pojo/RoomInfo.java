@@ -12,16 +12,13 @@ import lombok.Data;
 @TableName(value ="room_info")
 @Data
 public class RoomInfo {
+
     @TableId(type = IdType.AUTO)
-    private Long id;
+    private String roomNumber;
 
     private Long hotelId;
 
     private Long roomTypeId;
-
-    private String roomNumber;
-
-    private String img;
 
     private Integer status;
 }

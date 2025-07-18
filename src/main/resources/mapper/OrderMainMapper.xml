@@ -6,19 +6,16 @@
 
     <resultMap id="BaseResultMap" type="com.hotel.pojo.OrderMain">
             <id property="id" column="id" />
-            <result property="orderSn" column="order_sn" />
             <result property="customerId" column="customer_id" />
             <result property="hotelId" column="hotel_id" />
             <result property="roomTypeId" column="room_type_id" />
-            <result property="roomId" column="room_id" />
             <result property="checkinDate" column="checkin_date" />
             <result property="checkoutDate" column="checkout_date" />
             <result property="nights" column="nights" />
             <result property="channel" column="channel" />
-            <result property="isBreakfast" column="is_breakfast" />
+            <result property="breakfast" column="is_breakfast" />
             <result property="orderStatus" column="order_status" />
             <result property="createTime" column="create_time" />
-            <result property="source" column="source" />
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -27,33 +24,13 @@
         order_status,create_time,source
     </sql>
 
+    <update id="updateOrderStatus">
+        UPDATE order_main
+        SET order_status = #{orderStatus}
+        WHERE id = #{orderSn};
+    </update>
+
     <select id="saleStatusInPeriod" resultType="com.hotel.pojo.vo.RoomOrderVo">
-        SELECT
-        r.room_number RoomNumber,
-        c.name AS CustomerName,
-        o.channel as Source,
-        o.checkin_date CheckinDate,
-        o.checkout_date CheckoutDate,
-        r.status AS RoomStatus
-        FROM
-        room_info r
-        LEFT JOIN
-        order_main o ON r.id = o.room_id
-        AND o.room_type_id = #{roomTypeId}
-        AND (
-        (#{startDate} &lt;= o.checkout_date AND #{endDate} &gt;= o.checkin_date)
-        OR (o.checkin_date BETWEEN #{startDate} AND #{endDate})
-        OR (o.checkout_date BETWEEN #{startDate} AND #{endDate})
-        )
-        LEFT JOIN
-        customer_info c ON o.customer_id = c.id
-        WHERE
-        r.room_type_id = #{roomTypeId}
-        ORDER BY
-        r.room_number,
-        o.checkin_date;
-    </select>
-    <select id="saleStatusInOneDay" resultType="com.hotel.pojo.vo.RoomOrderVo">
         SELECT
             r.room_number RoomNumber,
             c.name AS CustomerName,
@@ -64,16 +41,157 @@
         FROM
             room_info r
                 LEFT JOIN
-            order_main o ON r.id = o.room_id
-                AND o.room_type_id = #{roomTypeId}
-                AND (#{date} between o.checkin_date and o.checkout_date)
+            order_main o
+                ON r.id = o.room_id
+                AND (#{roomTypeId} IS NULL OR o.room_type_id = #{roomTypeId})
+                AND (
+                    (o.checkin_date BETWEEN #{startDate} AND #{endDate})
+                    OR (o.checkout_date BETWEEN #{startDate} AND #{endDate})
+                )
                 LEFT JOIN
             customer_info c ON o.customer_id = c.id
-        WHERE
-            r.room_type_id = #{roomTypeId}
+        <where>
+            <if test="roomTypeId != null">
+                AND r.room_type_id = #{roomTypeId}
+            </if>
+        </where>
         ORDER BY
             r.room_number,
             o.checkin_date;
+    </select>
+
+    <select id="saleStatusInOneDay" resultType="com.hotel.pojo.vo.RoomOrderVo">
+        SELECT
+        ri.room_number           AS roomNumber,
+        ci.name                  AS customerName,
+        om.channel               AS source,
+        om.checkin_date          AS checkinDate,
+        om.checkout_date         AS checkoutDate,
+        ri.status                AS roomStatus
+        FROM room_info ri
+        LEFT JOIN order_main om
+        ON ri.room_number = om.room_number
+        AND ri.hotel_id = om.hotel_id
+        AND #{date} BETWEEN om.checkin_date AND om.checkout_date
+        LEFT JOIN customer_info ci ON om.customer_id = ci.id
+        WHERE ri.hotel_id = 1
+        AND ri.room_type_id = #{roomTypeId}
+    </select>
+
+    <select id="queryOrderInfo" resultType="com.hotel.pojo.vo.OrderMainVo">
+        SELECT
+        rt.type_name         AS RoomType,
+        ri.room_number       AS RoomNumber,
+        ci.phone             AS CustomerPhone,
+        om.id                AS orderSn,
+        ci.name              AS customerName,
+        om.checkin_date      AS checkinDate,
+        om.checkout_date     AS checkoutDate,
+        om.nights            AS nights,
+        om.channel           AS channel,
+        CASE om.breakfast
+        WHEN 0 THEN '含'
+        WHEN 1 THEN '不含'
+        ELSE ''
+        END                  AS isBreakfast,
+        om.order_status      AS orderStatus
+        FROM order_main om
+        JOIN customer_info ci   ON om.customer_id = ci.id
+        JOIN room_type rt       ON om.room_type_id = rt.id
+        LEFT JOIN room_info ri  ON om.room_number = ri.room_number
+        <where>
+            <if test="roomType != null and roomType.trim() != ''">
+                AND rt.id = #{roomType}
+            </if>
+            <if test="orderStatus != null and orderStatus.trim() != ''">
+                AND om.order_status = #{orderStatus}
+            </if>
+            <if test="roomNumber != null and roomNumber.trim() != ''">
+                AND ri.room_number LIKE CONCAT('%', #{roomNumber}, '%')
+            </if>
+            <if test="orderDate != null and orderDate.trim() != ''">
+                AND #{orderDate} between om.checkin_date and om.checkout_date
+            </if>
+            <if test="customerName != null and customerName.trim() != ''">
+                AND ci.name LIKE CONCAT('%', #{customerName}, '%')
+            </if>
+            <if test="customerPhone!= null and customerPhone.trim()!= ''">
+                AND ci.phone LIKE CONCAT('%', #{customerPhone}, '%')
+            </if>
+            <if test="customerPhone != null and customerPhone.trim() != ''">
+                AND ci.phone LIKE CONCAT('%', #{customerPhone}, '%')
+            </if>
+        </where>
+        ORDER BY om.create_time DESC
+    </select>
+
+    <select id="queryPageTime" resultType="com.hotel.pojo.vo.CustomerOrderVo">
+        SELECT
+        r.room_number,
+        c.name AS customer_name,
+        c.id_card idCard,
+        o.checkin_date,
+        o.checkout_date,
+        o.channel source,
+        o.nights night,
+        o.amount order_amount
+        FROM
+        order_main o
+        JOIN
+        room_info r ON r.room_number = o.room_number
+        JOIN
+        customer_info c ON o.customer_id = c.id
+        <where>
+            <if test="customerName!= null">
+                AND c.name LIKE CONCAT('%', #{customerName}, '%')
+            </if>
+            <!-- 如果入住时间和退房时间按都不为空就拼接条件-->
+            <if test="checkinDate!= null and checkoutDate!= null">
+                AND (
+                    (o.checkin_date BETWEEN #{checkinDate} AND #{checkoutDate})
+                    OR
+                    (o.checkout_date BETWEEN #{checkinDate} AND #{checkoutDate})
+                    )
+            </if>
+        </where>
+    </select>
+
+    <select id="queryPageInfo" resultType="com.hotel.pojo.vo.CustomerOrderVo">
+        SELECT
+        r.room_number,
+        c.name AS customer_name,
+        c.id_card idCard,
+        o.checkin_date,
+        o.checkout_date,
+        o.channel source,
+        o.nights night,
+        o.amount order_amount
+        FROM
+        order_main o
+        JOIN
+        room_info r ON r.room_number = o.room_number
+        JOIN
+        customer_info c ON o.customer_id = c.id
+        <where>
+            <if test="customerName!= null">
+                AND c.name LIKE CONCAT('%', #{customerName}, '%')
+            </if>
+            <if test="customerPhone!= null">
+                AND c.phone LIKE CONCAT('%', #{customerPhone}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="queryTurnover" resultType="com.hotel.pojo.Turnover">
+        SELECT
+        DATE_FORMAT(om.checkin_date, '%m') AS date,
+        SUM(om.amount)                   AS turnover
+        FROM order_main om
+        WHERE YEAR(om.checkin_date) = #{year}
+        <!-- 仅统计已支付/已入住/已完成 -->
+        AND om.order_status IN (1, 2, 3)
+        GROUP BY DATE_FORMAT(om.checkin_date, '%m')
+        ORDER BY date
     </select>
 
 </mapper>

@@ -2,6 +2,9 @@ package com.hotel.service;
 
 import com.hotel.pojo.RoomType;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.hotel.pojo.vo.RoomTypeVo;
+
+import java.util.List;
 
 /**
 * @author WenHua
@@ -10,4 +13,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface RoomTypeService extends IService<RoomType> {
 
+    List<RoomTypeVo> getAllRoomTypesWithRoomCount();
 }

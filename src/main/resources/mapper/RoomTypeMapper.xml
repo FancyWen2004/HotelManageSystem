@@ -9,10 +9,25 @@
             <result property="hotelId" column="hotel_id" />
             <result property="typeName" column="type_name" />
             <result property="description" column="description" />
-            <result property="totalRooms" column="total_rooms" />
     </resultMap>
 
     <sql id="Base_Column_List">
         id,hotel_id,type_name,description,total_rooms
     </sql>
+
+    <select id="getAllRoomTypesWithRoomCount" resultType="com.hotel.pojo.vo.RoomTypeVo">
+        SELECT
+            rt.id id,
+            rt.type_name type_name,
+            rt.description description,
+            rt.img img,
+            COUNT(ri.room_number) AS totalRooms
+        FROM
+            room_type rt
+                LEFT JOIN
+            room_info ri ON rt.id = ri.room_type_id
+        GROUP BY
+            rt.id, rt.type_name, rt.hotel_id, rt.description;
+    </select>
+
 </mapper>

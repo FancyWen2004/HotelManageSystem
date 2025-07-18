@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hotel.mapper.ProductOrderMapper">
+
+    <update id="updateProductOrderStatus">
+        update product_order
+        set status = #{status}
+        where id = #{id}
+    </update>
+
+    <select id="findProductOrder" resultType="com.hotel.pojo.vo.ProductOrderVo">
+        select
+        po.id,
+        ci.phone,
+        ci.name customerName,
+        product.product_name productName,
+        product.price,
+        po.quantity,
+        po.order_date orderDate,
+        po.status
+        from product_order po
+        left join
+        customer_info ci
+        on
+        po.customer_id = ci.id
+        left join
+        product
+        on
+        po.product_id = product.id
+        <where>
+            <if test="productName != null">
+                AND product.product_name like concat('%', #{productName}, '%')
+            </if>
+            <if test="orderTime!= null">
+                AND DATE(po.order_date) = #{orderTime}
+            </if>
+            <if test="status!= null">
+                AND po.status = #{status}
+            </if>
+        </where>
+        order by po.order_date desc
+    </select>
+
+</mapper>

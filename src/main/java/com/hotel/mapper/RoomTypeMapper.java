@@ -2,6 +2,9 @@ package com.hotel.mapper;
 
 import com.hotel.pojo.RoomType;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.hotel.pojo.vo.RoomTypeVo;
+
+import java.util.List;
 
 /**
 * @author WenHua
@@ -11,6 +14,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface RoomTypeMapper extends BaseMapper<RoomType> {
 
+    List<RoomTypeVo> getAllRoomTypesWithRoomCount();
 }
 
 

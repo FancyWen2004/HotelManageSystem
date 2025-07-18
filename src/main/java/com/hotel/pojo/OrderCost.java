@@ -17,9 +17,7 @@ public class OrderCost {
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private Long orderId;
-
-    private Integer costType;
+    private String orderId;
 
     private BigDecimal amount;
 

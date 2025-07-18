@@ -20,6 +20,8 @@ public class CustomerInfo {
 
     private String phone;
 
+    private String password;
+
     private String idCard;
 
     private Date registerTime;

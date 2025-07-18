@@ -14,6 +14,8 @@ import java.util.List;
 public interface RoomInfoMapper extends BaseMapper<RoomInfo> {
 
     List<RoomInfo> findByRoomTypeId(Long roomTypeId);
+
+    RoomInfo selectByRoomNum(Integer roomNumber);
 }
 
 

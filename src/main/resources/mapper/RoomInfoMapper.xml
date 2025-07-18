@@ -15,7 +15,12 @@
     <sql id="Base_Column_List">
         id,hotel_id,room_type_id,room_number,status
     </sql>
+
     <select id="findByRoomTypeId" resultType="com.hotel.pojo.RoomInfo">
         select * from room_info where room_type_id = #{roomTypeId}
+    </select>
+
+    <select id="selectByRoomNum" resultType="com.hotel.pojo.RoomInfo">
+        select * from room_info where room_number = #{roomNumber}
     </select>
 </mapper>

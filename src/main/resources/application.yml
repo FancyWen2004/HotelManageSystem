@@ -1,19 +1,6 @@
 server:
   port: 8080
-#  ???dev??
+#  使用dev环境
 spring:
   profiles:
     active: dev
-  # ??redis
-  data:
-    redis:
-      host: localhost
-      port: 6379
-      database: 1
-  mail:
-    host: smtp.163.com
-    username: Korn_Zen2020@163.com
-    password: XRkGX9i4vsqz3dGJ
-    protocol: smtp
-#logging:
-#  config: classpath:log4j2.xml
