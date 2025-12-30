@@ -1,6 +1,7 @@
 package com.hotel.common;
 
 import lombok.Data;
+
 import java.io.Serializable;
 
 // 通用返回结果类
@@ -25,14 +26,14 @@ public class Result<T> implements Serializable {
     }
 
     public static <T> Result<T> error(String msg) {
-        Result result = new Result();
+        Result<T> result = new Result<T>();
         result.msg = msg;
-        result.code = 0;
+        result.code = 50000;
         return result;
     }
 
     public static <T> Result<T> error(Integer code, String msg) {
-        Result result = new Result();
+        Result<T> result = new Result<T>();
         result.msg = msg;
         result.code = code;
         return result;
